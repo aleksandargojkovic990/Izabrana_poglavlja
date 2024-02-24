@@ -1,0 +1,63 @@
+is_global = true
+build_property.EnableAotAnalyzer = 
+build_property.EnableSingleFileAnalyzer = 
+build_property.EnableTrimAnalyzer = false
+build_property.IncludeAllContentForSelfExtract = 
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = false
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = browser
+build_property.RootNamespace = IP_aplikacija.Client
+build_property.RootNamespace = IP_aplikacija.Client
+build_property.ProjectDir = C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\IP_aplikacija\IP_aplikacija.Client\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = false
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\IP_aplikacija\IP_aplikacija.Client
+build_property._RazorSourceGeneratorDebug = 
+
+[C:/Users/aleks/Desktop/Izabrana_poglavlja/Projekat/IP_aplikacija/IP_aplikacija/IP_aplikacija.Client/Pages/Korisnik/PretragaKorisnika.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcS29yaXNuaWtcUHJldHJhZ2FLb3Jpc25pa2EucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/aleks/Desktop/Izabrana_poglavlja/Projekat/IP_aplikacija/IP_aplikacija/IP_aplikacija.Client/Pages/Korisnik/UnosKorisnika.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcS29yaXNuaWtcVW5vc0tvcmlzbmlrYS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/aleks/Desktop/Izabrana_poglavlja/Projekat/IP_aplikacija/IP_aplikacija/IP_aplikacija.Client/Pages/Paket/PretragaPaketa.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGFrZXRcUHJldHJhZ2FQYWtldGEucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/aleks/Desktop/Izabrana_poglavlja/Projekat/IP_aplikacija/IP_aplikacija/IP_aplikacija.Client/Pages/Paket/UnosPaketa.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGFrZXRcVW5vc1Bha2V0YS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/aleks/Desktop/Izabrana_poglavlja/Projekat/IP_aplikacija/IP_aplikacija/IP_aplikacija.Client/Pages/Ugovor/PretragaUgovora.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVWdvdm9yXFByZXRyYWdhVWdvdm9yYS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/aleks/Desktop/Izabrana_poglavlja/Projekat/IP_aplikacija/IP_aplikacija/IP_aplikacija.Client/Pages/Ugovor/UnosUgovora.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVWdvdm9yXFVub3NVZ292b3JhLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/aleks/Desktop/Izabrana_poglavlja/Projekat/IP_aplikacija/IP_aplikacija/IP_aplikacija.Client/Pages/Usluga/PretragaUsluga.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNsdWdhXFByZXRyYWdhVXNsdWdhLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/aleks/Desktop/Izabrana_poglavlja/Projekat/IP_aplikacija/IP_aplikacija/IP_aplikacija.Client/Pages/Usluga/UnosUsluge.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNsdWdhXFVub3NVc2x1Z2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/aleks/Desktop/Izabrana_poglavlja/Projekat/IP_aplikacija/IP_aplikacija/IP_aplikacija.Client/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/aleks/Desktop/Izabrana_poglavlja/Projekat/IP_aplikacija/IP_aplikacija/IP_aplikacija.Client/Components/Modal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-ffnia37fwa

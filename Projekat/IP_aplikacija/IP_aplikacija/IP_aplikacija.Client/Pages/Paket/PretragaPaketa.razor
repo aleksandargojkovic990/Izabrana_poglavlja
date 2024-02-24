@@ -1,0 +1,219 @@
+﻿@page "/pretraga-paketa"
+@page "/pretraga-paketa/{sifra:int}"
+@page "/pretraga-paketa/{selectPaket:bool}"
+@rendermode InteractiveAuto
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject UgovorState UgovorState
+
+<PageTitle>Pretraga paketa</PageTitle>
+
+<h1>Pretraga paketa</h1>
+
+<EditForm Model="paket" OnSubmit="HandleSubmit" method="post" FormName="unosPaketa">
+
+    <div class="form-group col-md-3">
+        <label>Šifra paketa:</label>
+        <InputNumber @bind-Value="paket.Sifra" class="form-control" />
+    </div>
+
+    <div class="form-group col-md-6">
+        <label>Naziv:</label>
+        <InputText @bind-Value="paket.Naziv" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <button type="submit">Pretraži</button>
+    </div>
+</EditForm>
+
+<div class="table-responsive mt-5">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Šifra paketa</th>
+                <th scope="col">Naziv paketa</th>
+                <th scope="col">Akcija</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (paketi.Count > 0)
+            {
+                @foreach (var p in paketi)
+                {
+                    <tr>
+                        <td scope="row">@p.Sifra</td>
+                        <td>@p.Naziv</td>
+                        <td class="action-buttons">
+                            @if (!SelectPaket)
+                            {
+                                <button type="button" class="m-0" @onclick="() => HandleUpdate(p)">Izmeni</button>
+                                <button type="button" class="m-0" @onclick="() => HandleDelete(p)">Obriši</button>
+                            }
+                            else
+                            {
+                                <button type="button" class="m-0" @onclick="() => HandleChoose(p)">Izaberi</button>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (OpenModal)
+{
+    <Modal Message="@message" OnClose="@OnClose" ButtonTypes="@buttonType"></Modal>
+}
+
+@code {
+    [Parameter]
+    public int Sifra { get; set; }
+
+    [Parameter]
+    public bool SelectPaket { get; set; }
+
+    [SupplyParameterFromForm]
+    private PaketDTO paket { get; set; } = new PaketDTO();
+
+    private PaketDTO paketOld { get; set; }
+    private PaketDTO paketToDelete { get; set; }
+    private List<PaketDTO> paketi = new List<PaketDTO>();
+
+    private string message;
+    private bool OpenModal { get; set; }
+    private Modal.ButtonTypesEnum buttonType;
+
+    // Happens after click on submit button
+    private async Task HandleSubmit()
+    {
+        await GetPaketi();
+    }
+
+    // Happens after click on update button
+    private void HandleUpdate(PaketDTO p)
+    {
+        Navigation.NavigateTo($"/unos-paketa/{p.Sifra}");
+    }
+
+    // Happens after click on delete button
+    private void HandleDelete(PaketDTO p)
+    {
+        buttonType = Modal.ButtonTypesEnum.SubmitCancel;
+        OpenModal = true;
+        message = "Da li želite da izbrišete ovaj paket?";        
+        paketToDelete = p;
+    }
+
+    // Happens after click on choose button
+    private void HandleChoose(PaketDTO p)
+    {
+        UgovorDTO ugovor = UgovorState.GetValue();
+        ugovor.Paket = p;
+        UgovorState.SetValue(ugovor);
+
+        if (!UgovorState.IsSearch)
+        {
+            Navigation.NavigateTo("/unos-ugovora/true");
+        }
+        else
+        {
+            UgovorState.IsSearch = false;
+            Navigation.NavigateTo("/pretraga-ugovora/true");
+        }
+    }
+
+    // Happens after page initialization
+    protected override async Task OnInitializedAsync()
+    {
+        // Checks if update page called this page
+        if (Sifra > 0)
+        {
+            paket = new PaketDTO{ Sifra = this.Sifra };
+        }
+
+        await GetPaketi();
+    }
+
+    // Gets list of Packages
+    private async Task GetPaketi(bool openModal = true)
+    {
+        var parameters = new Dictionary<string, string>();
+
+        if (paket.Sifra > 0) parameters.Add("sifraPaketa", paket.Sifra.ToString());
+        if (!string.IsNullOrWhiteSpace(paket.Naziv)) parameters.Add("nazivPaketa", paket.Naziv);
+
+        var query = string.Join("&", parameters.Select(s => $"{s.Key}={Uri.EscapeDataString(s.Value)}"));
+        var url = "api/Paket/GetPaketi" + (string.IsNullOrEmpty(query) ? "" : $"?{query}");
+
+        paketi = await Http.GetFromJsonAsync<List<PaketDTO>>(url);
+
+        message = paketi?.Count == 0 ? "Za zadate parametre paketi ne postoje." : "Pronađeni su paketi.";
+
+        if (openModal)
+        {
+            buttonType = Modal.ButtonTypesEnum.Ok;
+            OpenModal = true;
+        }
+    }
+
+    // Happens when the modal dialog is closed
+    private async Task OnClose(bool decision)
+    {
+        OpenModal = false;
+
+        // Checks if user clicked accept button on delete action
+        if (decision)
+        {
+            paketOld = new PaketDTO
+            {
+                Sifra = paket.Sifra,
+                Naziv = paket.Naziv
+            };
+
+            foreach (PaketUslugaDTO pu in paket.PaketUsluge)
+            {
+                PaketUslugaDTO puTemp = new PaketUslugaDTO
+                {
+                    Paket = null,
+                    Popust = pu.Popust,
+                    Usluga = new UslugaDTO
+                    {
+                        Sifra = pu.Usluga.Sifra,
+                        Naziv = pu.Usluga.Naziv,
+                        isChecked = pu.Usluga.isChecked
+                    }
+                };
+
+                foreach (CenovnikDTO c in pu.Usluga.Cenovnici)
+                {
+                    puTemp.Usluga.Cenovnici.Add(new CenovnikDTO
+                    {
+                        Sifra = c.Sifra,
+                        DatumOd = c.DatumOd,
+                        DatumDo = c.DatumDo,
+                        Cena = c.Cena,
+                        Usluga = null
+                    });
+                }
+
+                paketOld.PaketUsluge.Add(puTemp);
+            }
+
+            paket = paketToDelete;
+            var response = (await Http.PostAsJsonAsync<PaketDTO>("api/Paket/DeletePaket", paket));
+
+            message = response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.InternalServerError
+                ? await response.Content.ReadAsStringAsync() : "Paket nije obrisan.";
+
+            // Refresh grid
+            if (response.IsSuccessStatusCode)
+                paketi.Remove(paketToDelete);
+
+            paket = paketOld;
+            buttonType = Modal.ButtonTypesEnum.Ok;
+            OpenModal = true;
+        }
+    }
+}

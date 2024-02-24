@@ -1,0 +1,30 @@
+﻿<div id="modal">
+    <p id="modal-message">@Message</p>
+    <div class="text-end background-teal">
+        @if (ButtonTypes == ButtonTypesEnum.Ok)
+        {
+            <button type="button" @onclick="() => CloseModal(false)">Ok</button>
+        }
+        else if (ButtonTypes == ButtonTypesEnum.SubmitCancel)
+        {
+            <button type="button" @onclick="() => CloseModal(true)">Potvrdi</button>
+            <button type="button" @onclick="() => CloseModal(false)">Poništi</button>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Message { get; set; }
+    [Parameter]
+    public ButtonTypesEnum ButtonTypes { get; set; }
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+
+    private Task CloseModal(bool decision)
+    {
+        return OnClose.InvokeAsync(decision);
+    }
+
+    public enum ButtonTypesEnum { Ok = 1, SubmitCancel }
+}

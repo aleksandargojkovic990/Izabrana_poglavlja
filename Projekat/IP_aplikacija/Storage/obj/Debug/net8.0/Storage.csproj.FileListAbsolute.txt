@@ -1,0 +1,17 @@
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\bin\Debug\net8.0\Storage.deps.json
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\bin\Debug\net8.0\Storage.dll
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\bin\Debug\net8.0\Storage.pdb
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\bin\Debug\net8.0\DatabaseBroker.dll
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\bin\Debug\net8.0\Model.dll
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\bin\Debug\net8.0\DatabaseBroker.pdb
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\bin\Debug\net8.0\Model.pdb
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\obj\Debug\net8.0\Storage.csproj.AssemblyReference.cache
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\obj\Debug\net8.0\Storage.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\obj\Debug\net8.0\Storage.AssemblyInfoInputs.cache
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\obj\Debug\net8.0\Storage.AssemblyInfo.cs
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\obj\Debug\net8.0\Storage.csproj.CoreCompileInputs.cache
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\obj\Debug\net8.0\Storage.csproj.CopyComplete
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\obj\Debug\net8.0\Storage.dll
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\obj\Debug\net8.0\refint\Storage.dll
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\obj\Debug\net8.0\Storage.pdb
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\obj\Debug\net8.0\ref\Storage.dll

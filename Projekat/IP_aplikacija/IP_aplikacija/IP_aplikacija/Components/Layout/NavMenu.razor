@@ -1,0 +1,108 @@
+﻿@rendermode InteractiveServer
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">IP_aplikacija</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <div class="nav-link menu-pointer" @onclick="HandleKorisnikMenu">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Korisnik
+            </div>
+            <div class="@korisnikMenu">
+                <NavLink class="nav-link" href="unos-korisnika">
+                    <span></span> Unos
+                </NavLink>
+
+                <NavLink class="nav-link" href="pretraga-korisnika">
+                    <span></span> Pretraga
+                </NavLink>
+            </div>
+        </div>
+
+        <div class="nav-item px-3">
+            <div class="nav-link menu-pointer" @onclick="HandlePaketMenu">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Paket
+            </div>
+            <div class="@paketMenu">
+                <NavLink class="nav-link" href="unos-paketa">
+                    <span></span> Unos
+                </NavLink>
+
+                <NavLink class="nav-link" href="pretraga-paketa">
+                    <span></span> Pretraga
+                </NavLink>
+            </div>
+        </div>
+
+        <div class="nav-item px-3">
+            <div class="nav-link menu-pointer" @onclick="HandleUgovorMenu">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Ugovor
+            </div>
+            <div class="@ugovorMenu">
+                <NavLink class="nav-link" href="unos-ugovora">
+                    <span></span> Unos
+                </NavLink>
+
+                <NavLink class="nav-link" href="pretraga-ugovora">
+                    <span></span> Pretraga
+                </NavLink>
+            </div>
+        </div>
+
+        <div class="nav-item px-3">
+            <div class="nav-link menu-pointer" @onclick="HandleUslugaMenu">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Usluga
+            </div>
+            <div class="@uslugaMenu">
+                <NavLink class="nav-link" href="unos-usluge">
+                    <span></span> Unos
+                </NavLink>
+
+                <NavLink class="nav-link" href="pretraga-usluga">
+                    <span></span> Pretraga
+                </NavLink>
+            </div>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool korisnikMenuActive { get; set; } = false;
+    private string korisnikMenu { get; set; } = "hide-menu";
+    private bool paketMenuActive { get; set; } = false;
+    private string paketMenu { get; set; } = "hide-menu";
+    private bool ugovorMenuActive { get; set; } = false;
+    private string ugovorMenu { get; set; } = "hide-menu";
+    private bool uslugaMenuActive { get; set; } = false;
+    private string uslugaMenu { get; set; } = "hide-menu";
+
+    private void HandleKorisnikMenu()
+    {
+        korisnikMenuActive = !korisnikMenuActive;
+        korisnikMenu = korisnikMenuActive ? "enable-menu" : "hide-menu";
+    }
+
+    private void HandlePaketMenu()
+    {
+        paketMenuActive = !paketMenuActive;
+        paketMenu = paketMenuActive ? "enable-menu" : "hide-menu";
+    }
+
+    private void HandleUgovorMenu()
+    {
+        ugovorMenuActive = !ugovorMenuActive;
+        ugovorMenu = ugovorMenuActive ? "enable-menu" : "hide-menu";
+    }
+
+    private void HandleUslugaMenu()
+    {
+        uslugaMenuActive = !uslugaMenuActive;
+        uslugaMenu = uslugaMenuActive ? "enable-menu" : "hide-menu";
+    }
+}

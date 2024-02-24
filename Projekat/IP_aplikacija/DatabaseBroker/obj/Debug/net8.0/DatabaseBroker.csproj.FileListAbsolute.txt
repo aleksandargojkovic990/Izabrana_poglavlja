@@ -1,0 +1,15 @@
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\DatabaseBroker\bin\Debug\net8.0\DatabaseBroker.deps.json
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\DatabaseBroker\bin\Debug\net8.0\DatabaseBroker.dll
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\DatabaseBroker\bin\Debug\net8.0\DatabaseBroker.pdb
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\DatabaseBroker\bin\Debug\net8.0\Model.dll
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\DatabaseBroker\bin\Debug\net8.0\Model.pdb
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\DatabaseBroker\obj\Debug\net8.0\DatabaseBroker.csproj.AssemblyReference.cache
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\DatabaseBroker\obj\Debug\net8.0\DatabaseBroker.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\DatabaseBroker\obj\Debug\net8.0\DatabaseBroker.AssemblyInfoInputs.cache
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\DatabaseBroker\obj\Debug\net8.0\DatabaseBroker.AssemblyInfo.cs
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\DatabaseBroker\obj\Debug\net8.0\DatabaseBroker.csproj.CoreCompileInputs.cache
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\DatabaseBroker\obj\Debug\net8.0\DatabaseBroker.csproj.CopyComplete
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\DatabaseBroker\obj\Debug\net8.0\DatabaseBroker.dll
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\DatabaseBroker\obj\Debug\net8.0\refint\DatabaseBroker.dll
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\DatabaseBroker\obj\Debug\net8.0\DatabaseBroker.pdb
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\DatabaseBroker\obj\Debug\net8.0\ref\DatabaseBroker.dll

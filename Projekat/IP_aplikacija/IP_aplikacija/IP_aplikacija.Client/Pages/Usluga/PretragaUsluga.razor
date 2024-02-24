@@ -1,0 +1,223 @@
+﻿@page "/pretraga-usluga"
+@page "/pretraga-usluga/{sifra:int}"
+@rendermode InteractiveAuto
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<PageTitle>Pretraga usluga</PageTitle>
+
+<h1>Pretraga usluga</h1>
+
+<EditForm Model="usluga" OnValidSubmit="HandleSubmit" method="post" FormName="unosUsluge">
+    <div class="form-group col-md-3">
+        <label>Šifra usluge:</label>
+        <InputNumber @bind-Value="usluga.Sifra" class="form-control" />
+    </div>
+
+    <div class="form-group col-md-6">
+        <label>Naziv:</label>
+        <InputText @bind-Value="usluga.Naziv" class="form-control" />
+    </div>
+
+    <div class="form-group col-md-3">
+        <label>Datum od:</label>
+        <InputDate @bind-Value="cenovnik.DatumOd" class="form-control" />
+    </div>
+
+    <div class="form-group col-md-3">
+        <label>Datum do:</label>
+        <InputDate @bind-Value="cenovnik.DatumDo" class="form-control" />
+    </div>
+
+    <div class="form-group col-md-3">
+        <label>Cena:</label>
+        <InputNumber @bind-Value="cenovnik.Cena" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <button type="submit">Pretraži</button>
+    </div>
+</EditForm>
+
+<div class="table-responsive mt-5">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Šifra usluge</th>
+                <th scope="col">Naziv</th>
+                <th scope="col">Cena</th>
+                <th scope="col">Datum od</th>
+                <th scope="col">Datum do</th>
+                <th scope="col">Akcija</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (usluge.Count > 0)
+            {
+                @foreach (var u in usluge)
+                {
+                    foreach (var c in u.Cenovnici)
+                    {
+                        <tr>
+                            <td scope="row">@u.Sifra</td>
+                            <td>@u.Naziv</td>
+                            <td>@c.Cena</td>
+                            <td>@c.DatumOd</td>
+                            <td>@c.DatumDo</td>
+                            <td class="action-buttons">
+                                <button type="button" class="m-0" @onclick="() => HandleUpdate(u, c)">Izmeni</button>
+                                <button type="button" class="m-0" @onclick="() => HandleDelete(u, c)">Obriši</button>
+                            </td>
+                        </tr>
+                    }
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (OpenModal)
+{
+    <Modal Message="@message" OnClose="@OnClose" ButtonTypes="@buttonType"></Modal>
+}
+
+@code {
+    [Parameter]
+    public int Sifra { get; set; }
+
+    [SupplyParameterFromForm]
+    private UslugaDTO usluga { get; set; } = new UslugaDTO();
+    [SupplyParameterFromForm]
+    private CenovnikDTO cenovnik { get; set; } = new CenovnikDTO();
+
+    private CenovnikDTO cenovnikToDelete { get; set; }
+    private List<UslugaDTO> usluge = new List<UslugaDTO>();
+
+    private bool OpenModal { get; set; }
+    private string message;
+    private Modal.ButtonTypesEnum buttonType;
+
+    // Happens after click on submit button
+    private async Task HandleSubmit()
+    {
+        await GetUsluge();
+    }
+
+    // Happens after click on update button
+    private void HandleUpdate(UslugaDTO u, CenovnikDTO c)
+    {
+        Navigation.NavigateTo($"/unos-usluge/{u.Sifra}/{c.Sifra}");
+    }
+
+    // Happens after click on delete button
+    private void HandleDelete(UslugaDTO u, CenovnikDTO c)
+    {
+        buttonType = Modal.ButtonTypesEnum.SubmitCancel;
+        OpenModal = true;
+        message = "Da li želite da izbrišete ovu uslugu?";
+
+        // Needed for sending JSON to server
+        cenovnikToDelete = new CenovnikDTO
+        {
+            Sifra = c.Sifra,
+            DatumOd = c.DatumOd,
+            DatumDo = c.DatumDo,
+            Cena = c.Cena,
+            Usluga = new UslugaDTO
+            {
+                Sifra = u.Sifra,
+                Naziv = u.Naziv,
+                isChecked = u.isChecked,
+                Cenovnici = null
+            }
+        };
+    }
+
+    // Happens after page initialization
+    protected override async Task OnInitializedAsync()
+    {
+        // Checks if update page called this page
+        if (Sifra > 0)
+        {
+            usluga = new UslugaDTO { Sifra = this.Sifra };
+        }
+            
+        usluga.Cenovnici.Add(new CenovnikDTO());
+        await GetUsluge();
+        cenovnik = usluga.Cenovnici.First();
+    }
+
+    // Gets list of Services
+    private async Task GetUsluge(bool openModal = true)
+    {
+        var parameters = new Dictionary<string, string>();
+
+        if (usluga.Sifra > 0) 
+            parameters.Add("sifra", usluga.Sifra.ToString());
+
+        if (!string.IsNullOrWhiteSpace(usluga.Naziv))
+            parameters.Add("naziv", usluga.Naziv);
+
+        if (cenovnik.Sifra > 0) 
+            parameters.Add("sifraCenovnika", cenovnik.Sifra.ToString());
+
+        if (cenovnik.DatumOd > DateTime.Parse("01.01.1753", CultureInfo.InvariantCulture)
+            && cenovnik.DatumOd < DateTime.MaxValue) 
+            parameters.Add("datumOd", cenovnik.DatumOd?.ToString("yyyy-MM-dd"));
+
+        if (cenovnik.DatumDo > DateTime.Parse("01.01.1753", CultureInfo.InvariantCulture)
+            && cenovnik.DatumDo < DateTime.MaxValue)
+            parameters.Add("datumDo", cenovnik.DatumDo?.ToString("yyyy-MM-dd"));
+
+        if (cenovnik.Cena > 0) 
+            parameters.Add("cena", cenovnik.Cena.ToString());
+
+        var query = string.Join("&", parameters.Select(s => $"{s.Key}={Uri.EscapeDataString(s.Value)}"));
+        var url = "api/Usluga/GetUsluge" + (string.IsNullOrEmpty(query) ? "" : $"?{query}");
+
+        usluge = await Http.GetFromJsonAsync<List<UslugaDTO>>(url);
+        message = usluge is null || usluge.Count == 0 ? "Za zadate parametre usluge ne postoje." : "Pronađene su usluge.";
+
+        if (openModal)
+        {
+            buttonType = Modal.ButtonTypesEnum.Ok;
+            OpenModal = true;
+        }
+    }
+
+    // Happens when the modal dialog is closed
+    private async Task OnClose(bool decision)
+    {
+        OpenModal = false;
+
+        // Checks if user clicked accept button on delete action
+        if (decision)
+        {
+            var response = (await Http.PostAsJsonAsync<CenovnikDTO>("api/Cenovnik/DeleteCenovnik", cenovnikToDelete));
+
+            message = response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.InternalServerError
+                ? await response.Content.ReadAsStringAsync() : "Usluga nije obrisana.";
+
+            // If action was successful, check if beside Pricelist the Service was deleted aswell
+            if (response.IsSuccessStatusCode)
+            {
+                // Remove deleted Pricelist
+                UslugaDTO uTemp = usluge.First(x => x.Sifra == cenovnikToDelete.Usluga.Sifra);
+                CenovnikDTO cTemp = uTemp.Cenovnici.Where(y => y.Sifra == cenovnikToDelete.Sifra).First();
+                uTemp.Cenovnici.Remove(cTemp);
+
+                var u = await Http.GetFromJsonAsync<List<UslugaDTO>>($"api/Usluga/GetUsluge?sifra={cenovnikToDelete.Usluga.Sifra}");
+                
+                // Remove deleted Service
+                if (u is null || u.Count == 0)
+                {
+                    usluge.Remove(uTemp);
+                    message = "Uspešno obrisana usluga.";
+                }
+            }
+
+            buttonType = Modal.ButtonTypesEnum.Ok;
+            OpenModal = true;
+        }
+    }
+}

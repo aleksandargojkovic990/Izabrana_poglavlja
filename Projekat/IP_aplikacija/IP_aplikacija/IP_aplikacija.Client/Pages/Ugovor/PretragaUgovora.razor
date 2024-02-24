@@ -1,0 +1,283 @@
+﻿@page "/pretraga-ugovora"
+@page "/pretraga-ugovora/{sifra:int}"
+@page "/pretraga-ugovora/{selectedValue:bool}"
+@rendermode InteractiveAuto
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject UgovorState UgovorState
+
+<PageTitle>Pretraga ugovora</PageTitle>
+
+<h1>Pretraga ugovora</h1>
+
+<EditForm Model="ugovor" OnValidSubmit="HandleSubmit" method="post" FormName="unosUgovora">
+    <DataAnnotationsValidator />
+
+    <div class="form-group col-md-3">
+        <label>Broj ugovora:</label>
+        <InputNumber @bind-Value="ugovor.BrojUgovora" class="form-control" />
+    </div>
+
+    <div class="form-group col-md-3">
+        <label>Datum od:</label>
+        <InputDate @bind-Value="ugovor.DatumOd" class="form-control" />
+    </div>
+
+    <div class="form-group col-md-3">
+        <label>Datum do:</label>
+        <InputDate @bind-Value="ugovor.DatumDo" class="form-control" />
+    </div>
+
+    <div class="form-group col-md-6 my-3">
+        <div class="row">
+            <div class="col-3 pe-0">
+                <InputNumber @bind-Value="ugovor.Korisnik.Sifra" class="form-control" />
+            </div>
+
+            <div class="col-9">
+                <button type="button" class="m-0" @onclick="() => HandleFindKorisnik()">Izaberi korisnika</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group col-md-6 my-3">
+        <div class="row">
+            <div class="col-3 pe-0">
+                <InputNumber @bind-Value="ugovor.Paket.Sifra" class="form-control" />
+            </div>
+
+            <div class="col-9">
+                <button type="button" class="m-0" @onclick="() => HandleFindPaket()">Izaberi paket</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <button type="submit">Pretraži</button>
+    </div>
+</EditForm>
+
+<div class="table-responsive mt-5">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Broj ugovora</th>
+                <th scope="col">Datum od</th>
+                <th scope="col">Datum do</th>
+                <th scope="col">Šifra korisnika</th>
+                <th scope="col">Ime korisnika</th>
+                <th scope="col">Šifra paketa</th>
+                <th scope="col">Naziv paketa</th>
+                <th scope="col">Akcija</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (ugovori.Count > 0)
+            {
+                @foreach (var u in ugovori)
+                {
+                    <tr>
+                        <td scope="row">@u.BrojUgovora</td>
+                        <td>@u.DatumOd</td>
+                        <td>@u.DatumDo</td>
+                        <td>@u.Korisnik.Sifra</td>
+                        <td>@(u.Korisnik.Ime + " " + u.Korisnik.Prezime)</td>
+                        <td>@u.Paket.Sifra</td>
+                        <td>@u.Paket.Naziv</td>
+                        <td class="action-buttons">
+                            <button type="button" class="m-0" @onclick="() => HandleUpdate(u)">Izmeni</button>
+                            <button type="button" class="m-0" @onclick="() => HandleDelete(u)">Obriši</button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (OpenModal)
+{
+    <Modal Message="@message" OnClose="@OnClose" ButtonTypes="@buttonType"></Modal>
+}
+
+@code {
+    [Parameter]
+    public int Sifra { get; set; }
+
+    [Parameter]
+    public bool SelectedValue { get; set; }
+
+    [SupplyParameterFromForm]
+    private UgovorDTO ugovor { get; set; } = new UgovorDTO();
+
+    private UgovorDTO ugovorOld { get; set; }
+    private UgovorDTO ugovorToDelete { get; set; }
+    private List<UgovorDTO> ugovori = new List<UgovorDTO>();
+
+    private bool OpenModal { get; set; }
+    private string message;
+    private Modal.ButtonTypesEnum buttonType;
+
+    // Happens after click on submit button
+    private async Task HandleSubmit()
+    {
+        await GetUgovori();
+    }
+
+    // Happens after click on update button
+    private void HandleUpdate(UgovorDTO u)
+    {
+        Navigation.NavigateTo($"/unos-ugovora/{u.BrojUgovora}");
+    }
+
+    // Happens after click on delete button
+    private void HandleDelete(UgovorDTO u)
+    {
+        buttonType = Modal.ButtonTypesEnum.SubmitCancel;
+        OpenModal = true;
+        message = "Da li želite da izbrišete ovaj ugovor?";
+        ugovorToDelete = u;
+    }
+
+    // Happens after click on the button search User
+    private async Task HandleFindKorisnik()
+    {
+        UgovorState.SetValue(ugovor);
+        UgovorState.IsSearch = true;
+        Navigation.NavigateTo($"/pretraga-korisnika/{true}");
+    }
+
+    // Happens after click on the button search Package
+    private async Task HandleFindPaket()
+    {
+        UgovorState.SetValue(ugovor);
+        UgovorState.IsSearch = true;
+        Navigation.NavigateTo($"/pretraga-paketa/{true}");
+    }
+
+    // Happens after page initialization
+    protected override async Task OnInitializedAsync()
+    {
+        // Checks if update page called this page
+        if (Sifra > 0)
+            ugovor = new UgovorDTO { BrojUgovora = this.Sifra };
+        else if (SelectedValue)
+            ugovor = UgovorState.GetValue();
+
+        await GetUgovori();
+    }
+
+    // Gets list of Packages
+    private async Task GetUgovori(bool openModal = true)
+    {
+        var parameters = new Dictionary<string, string>();
+
+        if (ugovor.BrojUgovora > 0) parameters.Add("brojUgovora", ugovor.BrojUgovora.ToString());
+
+        if (ugovor.DatumOd > DateTime.Parse("01.01.1753", CultureInfo.InvariantCulture)
+            && ugovor.DatumOd < DateTime.MaxValue)
+            parameters.Add("datumOd", ugovor.DatumOd?.ToString("yyyy-MM-dd"));
+
+        if (ugovor.DatumDo > DateTime.Parse("01.01.1753", CultureInfo.InvariantCulture)
+            && ugovor.DatumDo < DateTime.MaxValue)
+            parameters.Add("datumDo", ugovor.DatumDo?.ToString("yyyy-MM-dd"));
+
+        if (ugovor.Korisnik.Sifra > 0) parameters.Add("sifraKorisnika", ugovor.Korisnik.Sifra.ToString());
+
+        if (ugovor.Paket.Sifra > 0) parameters.Add("sifraPaketa", ugovor.Paket.Sifra.ToString());
+
+        var query = string.Join("&", parameters.Select(s => $"{s.Key}={Uri.EscapeDataString(s.Value)}"));
+        var url = "api/Ugovor/GetUgovori" + (string.IsNullOrEmpty(query) ? "" : $"?{query}");
+
+        ugovori = await Http.GetFromJsonAsync<List<UgovorDTO>>(url);
+
+        message = ugovori?.Count == 0 ? "Za zadate parametre ugovori ne postoje." : "Pronađeni su ugovori.";
+
+        if (openModal)
+        {
+            buttonType = Modal.ButtonTypesEnum.Ok;
+            OpenModal = true;
+        }
+    }
+
+    // Happens when the modal dialog is closed
+    private async Task OnClose(bool decision)
+    {
+        OpenModal = false;
+
+        // Checks if user clicked accept button on delete action
+        if (decision)
+        {
+            #region Create copy of ugovor
+            List<PaketUslugaDTO> paketUsluge = new List<PaketUslugaDTO>();
+            foreach (PaketUslugaDTO pu in ugovor.Paket.PaketUsluge)
+            {
+                paketUsluge.Add(new PaketUslugaDTO
+                {
+                    Popust = pu.Popust,
+                    Usluga = new UslugaDTO
+                    {
+                        isChecked = pu.Usluga.isChecked,
+                        Naziv = pu.Usluga.Naziv,
+                        Sifra = pu.Usluga.Sifra
+                    },
+                    Paket = null
+                });
+            }
+
+            List<PretplataDTO> pretplate = new List<PretplataDTO>();
+            foreach (PretplataDTO p in pretplate)
+            {
+                pretplate.Add(new PretplataDTO
+                {
+                    Usluga = new UslugaDTO
+                    {
+                        isChecked = p.Usluga.isChecked,
+                        Naziv = p.Usluga.Naziv,
+                        Sifra = p.Usluga.Sifra
+                    },
+                    Ugovor = null,
+                    JeAktivna = p.JeAktivna
+                });
+            }
+
+            ugovorOld = new UgovorDTO
+            {
+                BrojUgovora = ugovor.BrojUgovora,
+                DatumOd = ugovor.DatumOd,
+                DatumDo = ugovor.DatumDo,
+                Korisnik = new KorisnikDTO
+                {
+                    BrojLicneKarte = ugovor.Korisnik.BrojLicneKarte,
+                    BrojTelefona = ugovor.Korisnik.BrojTelefona,
+                    Ime = ugovor.Korisnik.Ime,
+                    Prezime = ugovor.Korisnik.Prezime,
+                    Jmbg = ugovor.Korisnik.Jmbg,
+                    Sifra = ugovor.Korisnik.Sifra
+                },
+                Paket = new PaketDTO
+                {
+                    Naziv = ugovor.Paket.Naziv,
+                    Sifra = ugovor.Paket.Sifra,
+                    PaketUsluge = paketUsluge
+                },
+                Pretplate = pretplate
+            };
+            #endregion
+
+            ugovor = ugovorToDelete;
+            var response = (await Http.PostAsJsonAsync<UgovorDTO>("api/Ugovor/DeleteUgovor", ugovor));
+
+            message = response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.InternalServerError
+                ? await response.Content.ReadAsStringAsync() : "Ugovor nije obrisan.";
+
+            // Refresh grid
+            if (response.IsSuccessStatusCode)
+                ugovori.Remove(ugovorToDelete);
+
+            ugovor = ugovorOld;
+            buttonType = Modal.ButtonTypesEnum.Ok;
+            OpenModal = true;
+        }
+    }
+}

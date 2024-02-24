@@ -1,0 +1,176 @@
+﻿@page "/unos-paketa"
+@page "/unos-paketa/{sifra:int}"
+@rendermode InteractiveAuto
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<PageTitle>Unos paketa</PageTitle>
+
+<h1>Unos paketa</h1>
+
+<EditForm Model="paket" OnValidSubmit="HandleSubmit" method="post" FormName="unosPaketa">
+    <DataAnnotationsValidator />
+
+    <div class="form-group col-md-3">
+        <label>Šifra paketa:</label>
+        <InputNumber @bind-Value="paket.Sifra" class="form-control" disabled>
+        </InputNumber>
+    </div>
+
+    <div class="form-group col-md-6">
+        <label>Naziv<span class="text-danger">*</span>:</label>
+        <InputText @bind-Value="paket.Naziv" class="form-control">@paket.Naziv</InputText>
+        @if (!naziv)
+        {
+            <p class="text-danger">Naziv je obavezno polje.</p>
+        }
+    </div>
+
+    <div class="form-group col-md-6">
+        <div class="row">
+            @foreach (var item in paketiUsluge)
+            {
+                <div class="col-4">
+                    <div class="form-group">
+                        <div>
+                            <InputCheckbox @bind-Value="item.Usluga.isChecked" disabled="@isUpdate">@item.Usluga.Naziv</InputCheckbox>
+                            <label>@item.Usluga.Naziv</label>
+                        </div>
+
+                        <div>
+                            <label>Popust:</label>
+                            <InputNumber @bind-Value="item.Popust" class="form-control">@item.Popust</InputNumber>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (!hasUsluga)
+            {
+                <p class="text-danger">Morate izabrati barem jednu uslugu.</p>
+            }
+
+            @if (!popust)
+            {
+                <p class="text-danger">Popust za izabrane usluge mora biti veći ili jednak nuli.</p>
+            }
+        </div>
+    </div>
+
+    <div class="form-group">
+        <button type="submit">Sačuvaj</button>
+    </div>
+</EditForm>
+
+@if (OpenModal)
+{
+    <Modal Message="@message" OnClose="@OnClose" ButtonTypes="Modal.ButtonTypesEnum.Ok"></Modal>
+}
+
+@code {
+    [Parameter]
+    public int Sifra { get; set; }
+
+    [SupplyParameterFromForm]
+    private PaketDTO paket { get; set; } = new PaketDTO();
+
+    private List<PaketUslugaDTO> paketiUsluge { get; set; } = new List<PaketUslugaDTO>();
+
+    private bool OpenModal { get; set; }
+    private string message;
+
+    private bool isUpdate = false;
+
+    private bool hasUsluga = true;
+    private bool popust = true;
+    private bool naziv = true;
+
+    // Happens after form initialization
+    protected override async Task OnInitializedAsync()
+    {
+        // Indicates that this page is an update page
+        if (Sifra > 0)
+        {
+            paket = (await Http.GetFromJsonAsync<List<PaketDTO>>($"api/Paket/GetPaketi?sifraPaketa={Sifra}")).FirstOrDefault();
+            paketiUsluge = paket.PaketUsluge;
+            isUpdate = true;
+        }
+        else
+            await GetUsluge();
+    }
+
+    // Gets list of all main Services potentialy contained in the Package
+    private async Task GetUsluge()
+    {
+        List<UslugaDTO> usluge = await Http.GetFromJsonAsync<List<UslugaDTO>>("api/Usluga/GetUsluge?naziv=core");
+        paketiUsluge.Clear();
+
+        foreach (UslugaDTO usluga in usluge)
+        {
+            paketiUsluge.Add(new PaketUslugaDTO
+            {
+                Usluga = new UslugaDTO
+                {
+                    Sifra = usluga.Sifra,
+                    Naziv = usluga.Naziv,
+                    Cenovnici = usluga.Cenovnici,
+                    isChecked = usluga.isChecked
+                },
+                Paket = null
+            });
+        }
+
+        paket.PaketUsluge = paketiUsluge;
+    }
+
+    // Happens after click on the submit button
+    private async Task HandleSubmit()
+    {
+        // Validations
+        popust = !paketiUsluge.Any(x => x.Usluga.isChecked && x.Popust < 0);
+        hasUsluga = paketiUsluge.Any(x => x.Usluga.isChecked);
+        naziv = !string.IsNullOrWhiteSpace(paket.Naziv);
+
+        bool valid = hasUsluga && popust && naziv;
+
+        // Checks if all fields are validated
+        if (valid)
+        {
+            // Checks if form should add or update an object
+            if (!isUpdate)
+            {
+                paket.PaketUsluge = paket.PaketUsluge.Where(x => x.Usluga.isChecked).ToList();
+                var response = (await Http.PostAsJsonAsync<PaketDTO>("api/Paket/AddPaket", paket));
+
+                message = response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.InternalServerError
+                    ? await response.Content.ReadAsStringAsync() : "Paket nije unet.";
+
+                // If the response was successful, reset the form
+                if (response.IsSuccessStatusCode)
+                {
+                    paket = new PaketDTO();
+                    await GetUsluge();
+                }
+            }
+            else
+            {
+                var response = (await Http.PostAsJsonAsync<PaketDTO>("api/Paket/UpdatePaket", paket));
+
+                message = response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.InternalServerError
+                    ? await response.Content.ReadAsStringAsync() : "Paket nije ažuriran.";
+            }
+
+            OpenModal = true;
+        }
+    }
+
+    // Happens when the modal dialog is closed
+    private void OnClose(bool decision)
+    {
+        OpenModal = false;
+
+        // If it is an update page, after update redirect to pretraga-paketa
+        if (isUpdate)
+            Navigation.NavigateTo($"/pretraga-paketa/{paket.Sifra}");
+    }
+}

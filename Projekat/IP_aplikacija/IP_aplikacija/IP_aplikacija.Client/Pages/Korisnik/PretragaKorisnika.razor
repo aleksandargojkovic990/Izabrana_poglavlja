@@ -1,0 +1,229 @@
+﻿@page "/"
+@page "/pretraga-korisnika"
+@page "/pretraga-korisnika/{sifra:int}"
+@page "/pretraga-korisnika/{selectKorisnik:bool}"
+@rendermode InteractiveAuto
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject UgovorState UgovorState
+
+<PageTitle>Pretraga korisnika</PageTitle>
+
+<h1>Pretraga korisnika</h1>
+
+<EditForm Model="korisnik" OnSubmit="HandleSubmit" method="post" FormName="unosKorisnika">
+    <div class="form-group col-md-3">
+        <label>Šifra korisnika:</label>
+        <InputNumber @bind-Value="korisnik.Sifra" class="form-control" />
+    </div>
+
+    <div class="form-group col-md-6">
+        <label>Ime:</label>
+        <InputText @bind-Value="korisnik.Ime" class="form-control" />
+    </div>
+
+     <div class="form-group col-md-6">
+        <label>Prezime:</label>
+        <InputText @bind-Value="korisnik.Prezime" class="form-control" />
+     </div>
+
+    <div class="form-group col-md-6">
+        <label>Broj telefona:</label>
+        <InputText @bind-Value="korisnik.BrojTelefona" class="form-control" />
+    </div>
+
+    <div class="form-group col-md-6">
+        <div class="row">
+            <div class="col-6">
+                <label>JMBG:</label>
+                <InputText @bind-Value="korisnik.Jmbg" class="form-control" />
+                    <ValidationMessage For="@(() => korisnik.Jmbg)" />
+                </div>
+
+                <div class="col-6">
+                    <label>Broj LK:</label>
+                    <InputText @bind-Value="korisnik.BrojLicneKarte" class="form-control" />
+                    <ValidationMessage For="@(() => korisnik.BrojLicneKarte)" />
+                </div>
+            </div>
+        </div>
+
+    <div class="form-group">
+        <button type="submit">Pretraži</button>
+    </div>
+</EditForm>
+
+<div class="table-responsive mt-5"> 
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Šifra korisnika</th>
+                <th scope="col">JMBG</th>
+                <th scope="col">Ime</th>
+                <th scope="col">Prezime</th>
+                <th scope="col">Broj telefona</th>
+                <th scope="col">Broj lične karte</th>
+                <th scope="col">Akcija</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if(korisnici.Count > 0)
+            {
+                @foreach (var k in korisnici)
+                {
+                    <tr>
+                        <td scope="row">@k.Sifra</td>
+                        <td>@k.Jmbg</td>
+                        <td>@k.Ime</td>
+                        <td>@k.Prezime</td>
+                        <td>@k.BrojTelefona</td>
+                        <td>@k.BrojLicneKarte</td>
+                        <td class="action-buttons">
+                            @if (!SelectKorisnik)
+                            {
+                                <button type="button" class="m-0" @onclick="() => HandleUpdate(k)">Izmeni</button>
+                                <button type="button" class="m-0" @onclick="() => HandleDelete(k)">Obriši</button>
+                            }
+                            else
+                            {
+                                <button type="button" class="m-0" @onclick="() => HandleChoose(k)">Izaberi</button>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (OpenModal)
+{
+    <Modal Message="@message" OnClose="@OnClose" ButtonTypes="@buttonType"></Modal>
+}
+
+@code {
+    [Parameter]
+    public int Sifra { get; set; }
+
+    [Parameter]
+    public bool SelectKorisnik { get; set; }
+
+    [SupplyParameterFromForm]
+    private KorisnikDTO korisnik { get; set; } = new KorisnikDTO();
+
+    private KorisnikDTO korisnikOld { get; set; }
+    private KorisnikDTO korisnikToDelete { get; set; }
+    private List<KorisnikDTO> korisnici = new List<KorisnikDTO>();
+
+    private bool OpenModal { get; set; }
+    private string message;
+    private Modal.ButtonTypesEnum buttonType;
+
+    // Happens after click on submit button
+    private async Task HandleSubmit()
+    {
+        await GetKorisnici();
+    }
+
+    // Happens after click on update button
+    private void HandleUpdate(KorisnikDTO k)
+    {
+        Navigation.NavigateTo($"/unos-korisnika/{k.Sifra}");
+    }
+
+    // Happens after click on delete button
+    private void HandleDelete(KorisnikDTO k)
+    {
+        buttonType = Modal.ButtonTypesEnum.SubmitCancel;
+        OpenModal = true;
+        message = "Da li želite da izbrišete ovog korisnika?";
+        korisnikToDelete = k;
+    }
+
+    // Happens after click on choose button
+    private void HandleChoose(KorisnikDTO k)
+    {
+        UgovorDTO ugovor = UgovorState.GetValue();
+        ugovor.Korisnik = k;
+        UgovorState.SetValue(ugovor);
+        
+        if (!UgovorState.IsSearch)
+        {
+            Navigation.NavigateTo("/unos-ugovora/true");
+        }
+        else
+        {
+            UgovorState.IsSearch = false;
+            Navigation.NavigateTo("/pretraga-ugovora/true");
+        }
+    }
+
+    // Happens after page initialization
+    protected override async Task OnInitializedAsync()
+    {
+        // Checks if update page called this page
+        if (Sifra > 0)
+        {
+            korisnik = new KorisnikDTO() { Sifra = this.Sifra };
+        }
+
+        await GetKorisnici();
+    }
+
+    // Gets list of Users
+    private async Task GetKorisnici(bool openModal = true)
+    {
+        var parameters = new Dictionary<string, string>();
+
+        if (korisnik.Sifra > 0) parameters.Add("sifra", korisnik.Sifra.ToString());
+        if (!string.IsNullOrWhiteSpace(korisnik.Jmbg)) parameters.Add("jmbg", korisnik.Jmbg);
+        if (!string.IsNullOrWhiteSpace(korisnik.Ime)) parameters.Add("ime", korisnik.Ime);
+        if (!string.IsNullOrWhiteSpace(korisnik.Prezime)) parameters.Add("prezime", korisnik.Prezime);
+        if (!string.IsNullOrWhiteSpace(korisnik.BrojTelefona)) parameters.Add("brojTelefona", korisnik.BrojTelefona);
+        if (!string.IsNullOrWhiteSpace(korisnik.BrojLicneKarte)) parameters.Add("brojLicneKarte", korisnik.BrojLicneKarte);
+
+        var query = string.Join("&", parameters.Select(s => $"{s.Key}={Uri.EscapeDataString(s.Value)}"));
+        var url = "api/Korisnik/GetKorisnici" + (string.IsNullOrEmpty(query) ? "" : $"?{query}");
+
+        korisnici = await Http.GetFromJsonAsync<List<KorisnikDTO>>(url);
+
+        message = korisnici?.Count == 0 ? "Za zadate parametre korisnici ne postoje." : "Pronađeni su korisnici.";
+
+        if (openModal)
+        {
+            buttonType = Modal.ButtonTypesEnum.Ok;
+            OpenModal = true;
+        }
+    }
+
+    // Happens when the modal dialog is closed
+    private async Task OnClose(bool decision)
+    {
+        OpenModal = false;
+
+        // Checks if user clicked accept button on delete action
+        if (decision)
+        {
+            korisnikOld = new KorisnikDTO
+            {
+                Sifra = korisnik.Sifra,
+                Jmbg = korisnik.Jmbg,
+                Ime = korisnik.Ime,
+                Prezime = korisnik.Prezime,
+                BrojTelefona = korisnik.BrojTelefona,
+                BrojLicneKarte = korisnik.BrojLicneKarte
+            };
+
+            korisnik = korisnikToDelete;
+            var response = (await Http.PostAsJsonAsync<KorisnikDTO>("api/Korisnik/DeleteKorisnik", korisnik));
+
+            message = response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.InternalServerError
+                ? await response.Content.ReadAsStringAsync() : "Korisnik nije obrisan.";
+
+            korisnik = korisnikOld;
+            buttonType = Modal.ButtonTypesEnum.Ok;
+            OpenModal = true;
+            await GetKorisnici(false);
+        }
+    }
+}

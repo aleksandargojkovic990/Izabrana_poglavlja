@@ -1,0 +1,41 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\aleks\\Desktop\\Izabrana_poglavlja\\Projekat\\IP_aplikacija\\IP_aplikacija\\IP_aplikacija.Client\\bin\\Debug\\net8.0\\wwwroot\\_framework\\blazor.webassembly.js",
+      "PackagePath": "staticwebassets\\_framework\\blazor.webassembly.js"
+    },
+    {
+      "Id": "C:\\Users\\aleks\\Desktop\\Izabrana_poglavlja\\Projekat\\IP_aplikacija\\IP_aplikacija\\IP_aplikacija.Client\\obj\\Debug\\net8.0\\compressed\\uo9od98hqz.gz",
+      "PackagePath": "staticwebassets\\_framework\\blazor.webassembly.js.gz"
+    },
+    {
+      "Id": "C:\\Users\\aleks\\Desktop\\Izabrana_poglavlja\\Projekat\\IP_aplikacija\\IP_aplikacija\\IP_aplikacija.Client\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\IP_aplikacija.Client.bundle.scp.css",
+      "PackagePath": "staticwebassets\\IP_aplikacija.Client.bundle.scp.css"
+    },
+    {
+      "Id": "C:\\Users\\aleks\\Desktop\\Izabrana_poglavlja\\Projekat\\IP_aplikacija\\IP_aplikacija\\IP_aplikacija.Client\\wwwroot\\appsettings.Development.json",
+      "PackagePath": "staticwebassets\\appsettings.Development.json"
+    },
+    {
+      "Id": "C:\\Users\\aleks\\Desktop\\Izabrana_poglavlja\\Projekat\\IP_aplikacija\\IP_aplikacija\\IP_aplikacija.Client\\wwwroot\\appsettings.json",
+      "PackagePath": "staticwebassets\\appsettings.json"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.IP_aplikacija.Client.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.IP_aplikacija.Client.props",
+      "PackagePath": "build\\IP_aplikacija.Client.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.IP_aplikacija.Client.props",
+      "PackagePath": "buildMultiTargeting\\IP_aplikacija.Client.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.IP_aplikacija.Client.props",
+      "PackagePath": "buildTransitive\\IP_aplikacija.Client.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

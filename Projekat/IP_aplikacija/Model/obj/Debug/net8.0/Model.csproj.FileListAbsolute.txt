@@ -1,0 +1,12 @@
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Model\bin\Debug\net8.0\Model.deps.json
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Model\bin\Debug\net8.0\Model.dll
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Model\bin\Debug\net8.0\Model.pdb
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Model\obj\Debug\net8.0\Model.csproj.AssemblyReference.cache
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Model\obj\Debug\net8.0\Model.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Model\obj\Debug\net8.0\Model.AssemblyInfoInputs.cache
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Model\obj\Debug\net8.0\Model.AssemblyInfo.cs
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Model\obj\Debug\net8.0\Model.csproj.CoreCompileInputs.cache
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Model\obj\Debug\net8.0\Model.dll
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Model\obj\Debug\net8.0\refint\Model.dll
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Model\obj\Debug\net8.0\Model.pdb
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Model\obj\Debug\net8.0\ref\Model.dll

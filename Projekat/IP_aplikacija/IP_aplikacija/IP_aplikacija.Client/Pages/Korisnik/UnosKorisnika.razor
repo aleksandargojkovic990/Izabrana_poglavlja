@@ -1,0 +1,122 @@
+﻿@page "/unos-korisnika"
+@page "/unos-korisnika/{sifra:int}"
+@rendermode InteractiveAuto
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<PageTitle>Unos korisnika</PageTitle>
+
+<h1>Unos korisnika</h1>
+
+<EditForm Model="korisnik" OnValidSubmit="HandleSubmit" method="post" FormName="unosKorisnika">
+    <DataAnnotationsValidator />
+
+    <div class="form-group col-md-3">
+        <label>Šifra korisnika:</label>
+        <InputNumber @bind-Value="korisnik.Sifra" class="form-control" disabled>
+        </InputNumber>
+    </div>
+
+    <div class="form-group col-md-6">
+        <label>Ime<span class="text-danger">*</span>:</label>
+        <InputText @bind-Value="korisnik.Ime" class="form-control">@korisnik.Ime</InputText>
+        <ValidationMessage For="@(() => korisnik.Ime)" />
+    </div>
+
+    <div class="form-group col-md-6">
+        <label>Prezime<span class="text-danger">*</span>:</label>
+        <InputText @bind-Value="korisnik.Prezime" class="form-control">@korisnik.Prezime</InputText>
+        <ValidationMessage For="@(() => korisnik.Prezime)" />
+    </div>
+
+    <div class="form-group col-md-6">
+        <label>Broj telefona<span class="text-danger">*</span>:</label>
+        <InputText @bind-Value="korisnik.BrojTelefona" class="form-control">@korisnik.BrojTelefona</InputText>
+        <ValidationMessage For="@(() => korisnik.BrojTelefona)" />
+    </div>
+
+    <div class="form-group col-md-6">
+        <div class="row">
+            <div class="col-6">
+                <label>JMBG<span class="text-danger">*</span>:</label>
+                <InputText @bind-Value="korisnik.Jmbg" class="form-control">@korisnik.Jmbg</InputText>
+                <ValidationMessage For="@(() => korisnik.Jmbg)" />
+            </div>
+
+            <div class="col-6">
+                <label>Broj LK<span class ="text-danger">*</span>:</label>
+                <InputText @bind-Value="korisnik.BrojLicneKarte" class="form-control">@korisnik.BrojLicneKarte</InputText>
+                <ValidationMessage For="@(() => korisnik.BrojLicneKarte)" />
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <button type="submit">Sačuvaj</button>
+    </div>
+</EditForm>
+
+@if (OpenModal)
+{
+    <Modal Message="@message" OnClose="@OnClose" ButtonTypes="Modal.ButtonTypesEnum.Ok"></Modal>
+}
+
+@code {
+    [Parameter]
+    public int Sifra { get; set; }
+
+    [SupplyParameterFromForm]
+    private KorisnikDTO korisnik { get; set; } = new KorisnikDTO();
+
+    private bool OpenModal { get; set; }
+    private string message;
+
+    private bool isUpdate = false;
+
+    // Happens after form initialization
+    protected override async Task OnInitializedAsync()
+    {
+        // Indicates that this page is an update page
+        if (Sifra > 0)
+        {
+            korisnik = (await Http.GetFromJsonAsync<List<KorisnikDTO>>($"api/Korisnik/GetKorisnici?sifra={Sifra}")).FirstOrDefault();
+            isUpdate = true;
+        }
+    }
+
+    // Happens after click on the submit button
+    private async Task HandleSubmit()
+    {
+        // Checks if form should add or update an object
+        if (!isUpdate)
+        {
+            var response = (await Http.PostAsJsonAsync<KorisnikDTO>("api/Korisnik/AddKorisnik", korisnik));
+
+            message = response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.InternalServerError
+                ? await response.Content.ReadAsStringAsync() : "Korisnik nije unet.";
+
+            // Reset the form
+            if (response.IsSuccessStatusCode)
+                korisnik = new KorisnikDTO();
+        }
+        else
+        {
+            var response = (await Http.PostAsJsonAsync<KorisnikDTO>("api/Korisnik/UpdateKorisnik", korisnik));
+
+            message = response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.InternalServerError
+                ? await response.Content.ReadAsStringAsync() : "Korisnik nije ažuriran.";
+        }
+
+        OpenModal = true;
+    }
+
+    // Happens when the modal dialog is closed
+    private void OnClose(bool decision)
+    {
+        OpenModal = false;
+
+        // If it is an update page, after update redirect to pretraga-korisnika
+        if (isUpdate)
+            Navigation.NavigateTo($"/pretraga-korisnika/{korisnik.Sifra}");
+    }
+}

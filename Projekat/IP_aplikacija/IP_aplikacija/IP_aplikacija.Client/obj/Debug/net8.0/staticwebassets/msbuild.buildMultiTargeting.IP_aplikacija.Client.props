@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\IP_aplikacija.Client.props" />
+</Project>

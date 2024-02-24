@@ -1,0 +1,236 @@
+﻿@page "/unos-ugovora"
+@page "/unos-ugovora/{sifra:int}"
+@page "/unos-ugovora/{selectedValue:bool}"
+@rendermode InteractiveAuto
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject UgovorState UgovorState
+
+<PageTitle>Unos ugovora</PageTitle>
+
+<h1>Unos ugovora</h1>
+
+<EditForm Model="ugovor" OnValidSubmit="HandleSubmit" method="post" FormName="unosUgovora">
+    <DataAnnotationsValidator />
+
+    <div class="form-group col-md-3">
+        <label>Broj ugovora:</label>
+        <InputNumber @bind-Value="ugovor.BrojUgovora" class="form-control" disabled />
+    </div>
+
+    <div class="form-group col-md-3">
+        <label>Datum od<span class="text-danger">*</span>:</label>
+        <InputDate @bind-Value="ugovor.DatumOd" class="form-control">@ugovor.DatumOd</InputDate>
+            @if (!datumOd)
+        {
+            <p class="text-danger">Datum od je obavezno polje i mora biti veće od 01/01/1753.</p>
+        }
+    </div>
+
+    <div class="form-group col-md-3">
+        <label>Datum do<span class="text-danger">*</span>:</label>
+        <InputDate @bind-Value="ugovor.DatumDo" class="form-control">@ugovor.DatumDo</InputDate>
+            @if (!datumDo)
+        {
+            <p class="text-danger">Datum do je obavezno polje i mora biti veće od 01/01/1753 i od datuma od.</p>
+        }
+    </div>
+
+    <div class="form-group col-md-6 my-3">
+        <div class="row">
+            <div class="col-3 pe-0">
+                <InputNumber @bind-Value="ugovor.Korisnik.Sifra" class="form-control" disabled />
+            </div>
+
+            <div class="col-9">
+                <button type="button" class="m-0" @onclick="() => HandleFindKorisnik()">Izaberi korisnika</button>
+            </div>
+        </div>
+        @if (!korisnik)
+        {
+            <p class="text-danger">Morate izabrati korisnika.</p>
+        }
+    </div>
+
+    <div class="form-group col-md-6 my-3">
+        <div class="row">
+            <div class="col-3 pe-0">
+                <InputNumber @bind-Value="ugovor.Paket.Sifra" class="form-control" disabled />
+            </div>
+
+            <div class="col-9">
+                <button type="button" class="m-0" @onclick="() => HandleFindPaket()">Izaberi paket</button>
+            </div>
+        </div>
+        @if (!paket)
+        {
+            <p class="text-danger">Morate izabrati paket.</p>
+        }
+    </div>
+
+    <div class="form-group">
+        @foreach (var item in ugovor.Pretplate)
+        {
+            <div class="form-group">
+                <div>
+                    <InputCheckbox @bind-Value="item.Usluga.isChecked" disabled="@isUpdate">@item.Usluga.Naziv</InputCheckbox>
+                    <label>@item.Usluga.Naziv</label>
+                </div>
+
+                <div>
+                    <InputCheckbox @bind-Value="item.JeAktivna" disabled="@activeUgovor">@item.JeAktivna</InputCheckbox>
+                    <label>Aktivna usluga</label>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="form-group">
+        <button type="submit">Sačuvaj</button>
+    </div>
+</EditForm>
+
+@if (OpenModal)
+{
+    <Modal Message="@message" OnClose="@OnClose" ButtonTypes="Modal.ButtonTypesEnum.Ok"></Modal>
+}
+
+@code {
+    [Parameter]
+    public int Sifra { get; set; }
+
+    [Parameter]
+    public bool SelectedValue { get; set; }
+
+    [SupplyParameterFromForm]
+    private UgovorDTO ugovor { get; set; } = new UgovorDTO();
+
+    private bool OpenModal { get; set; }
+    private string message;
+
+    private bool isUpdate = false;
+    private bool activeUgovor = false;
+
+    // Validations
+    private bool datumOd = true;
+    private bool datumDo = true;
+    private bool korisnik = true;
+    private bool paket = true;
+
+    // Happens after form initialization
+    protected override async Task OnInitializedAsync()
+    {
+        // Indicates that this page is an update page
+        if (Sifra > 0)
+        {
+            ugovor = (await Http.GetFromJsonAsync<List<UgovorDTO>>($"api/Ugovor/GetUgovori?brojUgovora={Sifra}")).FirstOrDefault();
+            isUpdate = true;
+        }
+        else if (SelectedValue)
+        {
+            ugovor = UgovorState.GetValue();
+            isUpdate = UgovorState.IsUpdate;
+        }
+        else
+            await GetUsluge();
+
+        activeUgovor = isUpdate && ugovor.DatumDo >= DateTime.Now;
+    }
+
+    // Gets list of all main Services potentialy contained in the Package
+    private async Task GetUsluge()
+    {
+        List<UslugaDTO> usluge = await Http.GetFromJsonAsync<List<UslugaDTO>>("api/Usluga/GetUsluge?naziv=additional");
+        ugovor.Pretplate.Clear();
+
+        foreach (UslugaDTO usluga in usluge)
+        {
+            ugovor.Pretplate.Add(new PretplataDTO
+                {
+                    Usluga = new UslugaDTO
+                    {
+                        Sifra = usluga.Sifra,
+                        Naziv = usluga.Naziv,
+                        Cenovnici = usluga.Cenovnici,
+                        isChecked = usluga.isChecked
+                    },
+                    Ugovor = null,
+                    JeAktivna = true
+                });
+        }
+    }
+
+    // Happens after click on the button search User
+    private async Task HandleFindKorisnik()
+    {
+        UgovorState.SetValue(ugovor);
+        UgovorState.IsUpdate = isUpdate;
+        UgovorState.IsSearch = false;
+        Navigation.NavigateTo($"/pretraga-korisnika/{true}");
+    }
+
+    // Happens after click on the button search Package
+    private async Task HandleFindPaket()
+    {
+        UgovorState.SetValue(ugovor);
+        UgovorState.IsUpdate = isUpdate;
+        UgovorState.IsSearch = false;
+        Navigation.NavigateTo($"/pretraga-paketa/{true}");
+    }
+
+    // Happens after click on the submit button
+    private async Task HandleSubmit()
+    {
+        // Validations
+        korisnik = !(ugovor.Korisnik.Sifra is null || ugovor.Korisnik.Sifra == 0);
+        paket = !(ugovor.Paket.Sifra is null || ugovor.Paket.Sifra == 0);
+        datumOd = ugovor.DatumOd >= DateTime.Parse("01.01.1753", CultureInfo.InvariantCulture)
+            && ugovor.DatumOd <= DateTime.MaxValue;
+        datumDo = (ugovor.DatumDo >= DateTime.Parse("01.01.1753", CultureInfo.InvariantCulture)
+            && ugovor.DatumDo <= DateTime.MaxValue
+            && ugovor.DatumDo >= ugovor.DatumOd) || ugovor.DatumDo is null ? true : false;
+
+        bool valid = korisnik && paket && datumOd && datumDo;
+
+        // Checks if all fields are validated
+        if (valid)
+        {
+            // Checks if form should add or update an object
+            if (!isUpdate)
+            {
+                ugovor.Pretplate = ugovor.Pretplate.Where(x => x.Usluga.isChecked).ToList();
+                var response = (await Http.PostAsJsonAsync<UgovorDTO>("api/Ugovor/AddUgovor", ugovor));
+
+                message = response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.InternalServerError
+                    ? await response.Content.ReadAsStringAsync() : "Ugovor nije unet.";
+
+                // If the response was successful, reset the form
+                if (response.IsSuccessStatusCode)
+                {
+                    ugovor = new UgovorDTO();
+                    UgovorState.SetValue(new UgovorDTO());
+                    await GetUsluge();
+                }
+            }
+            else
+            {
+                var response = (await Http.PostAsJsonAsync<UgovorDTO>("api/Ugovor/UpdateUgovor", ugovor));
+
+                message = response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.InternalServerError
+                    ? await response.Content.ReadAsStringAsync() : "Ugovor nije ažuriran.";
+            }
+
+            OpenModal = true;
+        }
+    }
+
+    // Happens when the modal dialog is closed
+    private void OnClose(bool decision)
+    {
+        OpenModal = false;
+
+        // If it is an update page, after update redirect to pretraga-paketa
+        if (isUpdate)
+            Navigation.NavigateTo($"/pretraga-ugovora/{ugovor.BrojUgovora}");
+    }
+}
