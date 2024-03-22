@@ -1,5 +1,5 @@
 ﻿@page "/unos-usluge"
-@page "/unos-usluge/{sifraUsluge:int}/{sifraCenovnika:int}"
+@page "/unos-usluge/{sifraUsluge:int}"
 @rendermode InteractiveAuto
 @inject HttpClient Http
 @inject NavigationManager Navigation
@@ -36,7 +36,6 @@
     </div>
 
     <div class="form-group col-md-3">
-        <label>Datum do<span class="text-danger">*</span>:</label>
         <InputDate @bind-Value="cenovnik.DatumDo" class="form-control">@cenovnik.DatumDo</InputDate>
         @if (!datumDo)
         {
@@ -53,10 +52,49 @@
         }
     </div>
 
-    <div class="form-group">
+    @* <div class="form-group">
         <button type="submit">Sačuvaj</button>
+    </div> *@
+    <div class="form-group">
+        <button type="submit">Dodaj</button>
     </div>
 </EditForm>
+
+<div class="table-responsive mt-5">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Datum od</th>
+                <th scope="col">Datum do</th>
+                <th scope="col">Cena</th>
+                <th scope="col">Operacija</th>
+                <th scope="col">Akcija</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (cene.Count > 0)
+            {
+                @foreach (var c in cene)
+                {
+                    <tr>
+                        <td>@c.DatumOd</td>
+                        <td>@c.DatumDo</td>
+                        <td>@c.Cena</td>
+                        <td>@c.Action</td>
+                        <td class="action-buttons">
+                            <button type="button" class="m-0" @onclick="() => HandleUpdate(c)">Izmeni</button>
+                            <button type="button" class="m-0" @onclick="() => HandleDelete(c)">Obriši</button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+<div>
+    <button type="button" @onclick="() => HandleSave()">Sačuvaj</button>
+</div>
 
 @if (OpenModal)
 {
@@ -66,18 +104,19 @@
 @code {
     [Parameter]
     public int SifraUsluge { get; set; }
-    [Parameter]
-    public int SifraCenovnika { get; set; }
 
     [SupplyParameterFromForm]
     private UslugaDTO usluga { get; set; } = new UslugaDTO();
     [SupplyParameterFromForm]
     private CenovnikDTO cenovnik { get; set; } = new CenovnikDTO();
 
+    private List<CenovnikDTO> cene { get; set; } = new List<CenovnikDTO>();
+
     private bool OpenModal { get; set; }
     private string message;
 
     private bool isUpdate = false;
+    private bool isCenovnikUpdate = false;
 
     // Validations
     private bool naziv = true;
@@ -89,19 +128,21 @@
     protected override async Task OnInitializedAsync()
     {
         // Indicates that this page is an update page
-        if (SifraUsluge > 0 && SifraCenovnika > 0)
+        if (SifraUsluge > 0)
         {
-            usluga = (await Http.GetFromJsonAsync<List<UslugaDTO>>($"api/Usluga/GetUsluge?sifra={SifraUsluge}&sifraCenovnika={SifraCenovnika}")).First();
+            usluga = (await Http.GetFromJsonAsync<List<UslugaDTO>>($"api/Usluga/GetUsluge?sifra={SifraUsluge}")).First();
+            cene = usluga.Cenovnici;
             isUpdate = true;
         }
         else
+        {
             usluga.Cenovnici.Add(new CenovnikDTO());
-
-        cenovnik = usluga.Cenovnici.First();
+            cenovnik = usluga.Cenovnici.First();
+        }
     }
 
     // Happens after click on the submit button
-    private async Task HandleSubmit()
+    private void HandleSubmit()
     {
         // Validations
         naziv = !string.IsNullOrWhiteSpace(usluga.Naziv) ? true : false;
@@ -117,73 +158,70 @@
         // Checks if all fields are validated
         if (valid)
         {
+            if (!isCenovnikUpdate)
+            {
+                cenovnik.Usluga = usluga;
+                cenovnik.Action = Model.Action.Add;
+                cene.Add(cenovnik);
+            }
+            else
+            {
+                cenovnik.Usluga = usluga;
+                cenovnik.Action = !(cenovnik.Sifra > 0 && cenovnik.Sifra is not null) ? Model.Action.Add : Model.Action.Update;
+
+                // if (cenovnik.Sifra > 0 && cenovnik.Sifra is not null)
+                // {
+                //     CenovnikDTO c = cene.Where(x => x.Sifra == cenovnik.Sifra).First();
+                //     c.DatumOd = cenovnik.DatumOd;
+                //     c.DatumDo = cenovnik.DatumDo;
+                //     c.Cena = cenovnik.Cena;
+                // }
+
+                isCenovnikUpdate = false;
+            }
+
+            cenovnik = new CenovnikDTO();
+        }
+    }
+
+    // Happens after click on the update button in the grid
+    private void HandleUpdate(CenovnikDTO c)
+    {
+        cenovnik = c;
+        isCenovnikUpdate = true;
+    }
+
+    // Happens after click on the delete button in the grid
+    private void HandleDelete(CenovnikDTO c)
+    {
+        if (c.Sifra > 0 && c.Sifra is not null)
+            c.Action = Model.Action.Delete;
+        else
+            cene.Remove(c);
+    }
+
+    // Happens after click on the save button
+    private async Task HandleSave()
+    {
+        if (usluga.Cenovnici.Count > 0 && usluga.Cenovnici.First().Cena > -1)
+        {
+            cene.ForEach(c => c.Usluga = null);
+            usluga.Cenovnici = cene;
+
             // Checks if form should add or update an object
             if (!isUpdate)
             {
-                // Checks if there are existing Pricelists for the Service we are trying to add.
-                List<CenovnikDTO> existingCenovnik = (await Http
-                        .GetFromJsonAsync<List<CenovnikDTO>>($"api/Cenovnik/GetCenovnici?nazivUsluge={Uri.EscapeDataString(usluga.Naziv)}"));
+                var response = (await Http.PostAsJsonAsync<UslugaDTO>("api/Usluga/AddUsluga", usluga));
+                message = response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.InternalServerError
+                    ? await response.Content.ReadAsStringAsync() : "Usluga nije uneta.";
 
-                // If there are, do an update if needed and add a new one
-                if (existingCenovnik.Count > 0)
+                // Clear the form
+                if (response.IsSuccessStatusCode)
                 {
-                    HttpResponseMessage? response = null;
-
-                    foreach (CenovnikDTO c in existingCenovnik)
-                    {
-                        bool shouldBeChanged = false;
-                        if ((c.DatumOd > cenovnik.DatumOd && c.DatumDo < cenovnik.DatumDo) || (c.DatumOd > cenovnik.DatumOd && c.DatumDo is null))
-                        {
-                            response = (await Http.PostAsJsonAsync<CenovnikDTO>("api/Cenovnik/DeleteCenovnik", c));
-                            shouldBeChanged = true;
-                        }
-                        else if ((c.DatumOd < cenovnik.DatumDo && cenovnik.DatumDo < c.DatumDo) || (c.DatumDo is null && c.DatumOd < cenovnik.DatumDo))
-                        {
-                            c.DatumOd = cenovnik.DatumDo;
-                            response = (await Http.PostAsJsonAsync<CenovnikDTO>("api/Cenovnik/UpdateCenovnik", c));
-                            shouldBeChanged = true;
-                        }
-                        else if ((c.DatumOd < cenovnik.DatumOd && cenovnik.DatumOd < c.DatumDo) || (c.DatumDo is null && c.DatumOd < cenovnik.DatumOd))
-                        {
-                            c.DatumDo = cenovnik.DatumOd;
-                            response = (await Http.PostAsJsonAsync<CenovnikDTO>("api/Cenovnik/UpdateCenovnik", c));
-                            shouldBeChanged = true;
-                        }
-
-                        if (shouldBeChanged && !response.IsSuccessStatusCode)
-                        {
-                            message = "Cenovnik nije ažuriran.";
-                            OpenModal = true;
-                            return;
-                        }
-                    }
-
-                    // This is needed for JSON transfer "bug" between Client and Server
-                    usluga.Cenovnici = null;
-                    usluga.Sifra = existingCenovnik.FirstOrDefault()?.Usluga.Sifra;
-                    cenovnik.Usluga = usluga;
-
-                    response = (await Http.PostAsJsonAsync<CenovnikDTO>("api/Cenovnik/AddCenovnik", cenovnik));
-                    message = response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.InternalServerError
-                        ? await response.Content.ReadAsStringAsync() : "Cenovnik nije dodat.";
-
-                    // Reset the form
-                    if (response.IsSuccessStatusCode)
-                        cenovnik = new CenovnikDTO();
-                }
-                else
-                {
-                    var response = (await Http.PostAsJsonAsync<UslugaDTO>("api/Usluga/AddUsluga", usluga));
-                    message = response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.InternalServerError
-                        ? await response.Content.ReadAsStringAsync() : "Usluga nije uneta.";
-
-                    // Clear the form
-                    if (response.IsSuccessStatusCode)
-                    {
-                        usluga = new UslugaDTO();
-                        cenovnik = new CenovnikDTO();
-                        usluga.Cenovnici.Add(cenovnik);
-                    }
+                    cene = new List<CenovnikDTO>();
+                    usluga = new UslugaDTO();
+                    cenovnik = new CenovnikDTO();
+                    usluga.Cenovnici.Add(cenovnik);
                 }
             }
             else
@@ -191,8 +229,13 @@
                 var response = (await Http.PostAsJsonAsync<UslugaDTO>("api/Usluga/UpdateUsluga", usluga));
                 message = response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.InternalServerError
                     ? await response.Content.ReadAsStringAsync() : "Usluga nije ažurirana.";
-            }
 
+                OpenModal = true;
+            }
+        }
+        else
+        {
+            message = !isUpdate ? "Usluga nije uneta." : "Usluga nije ažurirana.";
             OpenModal = true;
         }
     }
@@ -207,3 +250,4 @@
             Navigation.NavigateTo($"/pretraga-usluga/{usluga.Sifra}");
     }
 }
+

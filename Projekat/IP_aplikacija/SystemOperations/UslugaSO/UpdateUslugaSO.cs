@@ -15,7 +15,12 @@ namespace SystemOperations.UslugaSO
 
             foreach (Cenovnik cenovnik in ((Usluga)entity).Cenovnici)
             {
-                await repository.Update(cenovnik);
+                if (cenovnik.Action == Model.Action.Update)
+                    await repository.Update(cenovnik);
+                else if(cenovnik.Action == Model.Action.Add)
+                    await repository.Save(cenovnik);
+                else if (cenovnik.Action == Model.Action.Delete)
+                    await repository.Delete(cenovnik);
             }
         }
     }

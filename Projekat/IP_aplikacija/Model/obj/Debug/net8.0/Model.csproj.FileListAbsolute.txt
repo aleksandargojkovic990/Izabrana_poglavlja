@@ -10,3 +10,4 @@ C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Model\obj\Debug
 C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Model\obj\Debug\net8.0\refint\Model.dll
 C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Model\obj\Debug\net8.0\Model.pdb
 C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Model\obj\Debug\net8.0\ref\Model.dll
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Model\obj\Debug\net8.0\Model.sourcelink.json

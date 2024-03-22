@@ -113,7 +113,8 @@ namespace IP_aplikacija.Helpers
                     Usluga = usluga,
                     DatumOd = cenovnik.DatumOd ?? DateTime.Parse("01.01.1753", CultureInfo.InvariantCulture),
                     DatumDo = cenovnik.DatumDo,
-                    Cena = cenovnik.Cena ?? 0
+                    Cena = cenovnik.Cena ?? 0,
+                    Action = cenovnik.Action
                 });
             }
 

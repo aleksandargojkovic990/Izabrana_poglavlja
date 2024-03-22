@@ -8,6 +8,7 @@
         public DateTime? DatumOd { get; set; }
         public DateTime? DatumDo { get; set; }
         public decimal? Cena { get; set; }
+        public Action? Action { get; set; }
         #endregion
     }
 }
