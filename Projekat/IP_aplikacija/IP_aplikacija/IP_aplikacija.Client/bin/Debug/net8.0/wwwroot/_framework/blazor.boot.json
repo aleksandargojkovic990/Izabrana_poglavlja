@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "IP_aplikacija.Client",
   "resources": {
-    "hash": "sha256-U+ctsj09p8o1l+hSu/Hl2P7kdlQrBfzAfHSRgYYCtIA=",
+    "hash": "sha256-s3L793sQ7qSy87wV10sfW0WTzCqE0PHBEBAmqRvzwiM=",
     "jsModuleNative": {
       "dotnet.native.8.0.1.11q2x91y6y.js": "sha256-SGOlISx+3G4kkvpC9Uq3qoPGsnjxGmW61QBev0lyI5U="
     },
@@ -230,12 +230,12 @@
       "mscorlib.wasm": "sha256-EpWTfh4m/hEcXRFYMCR9YeYHwdUJgcm1laBaxWfq2S4=",
       "netstandard.wasm": "sha256-2kH24/YfHmU3B4eYRyRmiwebYROM4+B9eDWKvMnUdP8=",
       "System.Private.CoreLib.wasm": "sha256-CsySKiP7HYY1pS8LTDE60EkqiX5oHb3WoEZHDNd1yK0=",
-      "Model.wasm": "sha256-Q0LSSxIL+Ca1Z9rOmFLtGL7XUaQ/ycu8r2R/i7LSXjA=",
-      "IP_aplikacija.Client.wasm": "sha256-SM90DUKAPD6rFMtkaR0gkHWfBHD2++g2vc2yn4+JDS0="
+      "Model.wasm": "sha256-1BgxO49ex6yNQ/ucMQHkT6fZP+PkbUwyYGuWf/jqfqI=",
+      "IP_aplikacija.Client.wasm": "sha256-6rOBHkQ2t0IslyCwscH221JejaMOFpN6wRu+PgpMx1c="
     },
     "pdb": {
-      "Model.pdb": "sha256-mMOzpXWlZc8a3nmVFvAmb/k37nlD3Om9txw9GQuQ++k=",
-      "IP_aplikacija.Client.pdb": "sha256-MeRNk80Ub6533MhYk7J6MAn6VZYPx9VjC/CsG0urE+c="
+      "Model.pdb": "sha256-mSvVfTl3q9Wwf4Wi+7CuJ3afcq9utxiKYmE6mvSl3sA=",
+      "IP_aplikacija.Client.pdb": "sha256-Lz1pP9bS/efrjGOJZm8xgjNNY9ERo69v+Z/EYyb8QP4="
     }
   },
   "cacheBootResources": true,

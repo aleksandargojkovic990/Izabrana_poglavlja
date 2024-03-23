@@ -1147,3 +1147,4 @@ C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\IP_aplikacija\I
 C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\IP_aplikacija\IP_aplikacija.Client\obj\Debug\net8.0\refint\IP_aplikacija.Client.dll
 C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\IP_aplikacija\IP_aplikacija.Client\obj\Debug\net8.0\IP_aplikacija.Client.pdb
 C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\IP_aplikacija\IP_aplikacija.Client\obj\Debug\net8.0\ref\IP_aplikacija.Client.dll
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\IP_aplikacija\IP_aplikacija.Client\obj\Debug\net8.0\IP_aplikacija.Client.sourcelink.json

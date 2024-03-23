@@ -17,3 +17,4 @@ C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\SystemOperation
 C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\SystemOperations\obj\Debug\net8.0\refint\SystemOperations.dll
 C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\SystemOperations\obj\Debug\net8.0\SystemOperations.pdb
 C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\SystemOperations\obj\Debug\net8.0\ref\SystemOperations.dll
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\SystemOperations\obj\Debug\net8.0\SystemOperations.sourcelink.json

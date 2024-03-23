@@ -15,3 +15,4 @@ C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\obj\Deb
 C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\obj\Debug\net8.0\refint\Storage.dll
 C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\obj\Debug\net8.0\Storage.pdb
 C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\obj\Debug\net8.0\ref\Storage.dll
+C:\Users\aleks\Desktop\Izabrana_poglavlja\Projekat\IP_aplikacija\Storage\obj\Debug\net8.0\Storage.sourcelink.json
